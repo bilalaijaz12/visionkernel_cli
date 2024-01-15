@@ -2,8 +2,7 @@ import os
 import argparse
 import getpass
 from convert import convert_to_excel
-from connectdatabase import connect_to_aws_rds, connect_to_azure_sql, connect_to_google_cloud_sql, connect_to_google_cloud_storage, create_table_postgresql, create_table_azure_sql, create_table_gcloud_sql
-from createdatabase import create_database
+from connectdatabase import connect_to_aws_rds, connect_to_azure_sql, connect_to_google_cloud_sql, connect_to_google_cloud_storage, create_table_mysql, create_table_azure_sql, create_table_gcloud_sql
 from createtable import create_custom_table, list_tables
 from uploaddata import upload_excel_data, auto_create_table_from_excel
 
@@ -129,7 +128,7 @@ def main():
 
             if args.database_endpoint:
                 connection = connect_to_aws_rds(args.database_endpoint, args.database_name, args.username, password)
-                create_table_postgresql(connection, args.table_name, args.column_definitions)
+                create_table_mysql(connection, args.table_name, args.column_definitions)
             elif args.server_name:
                 connection = connect_to_azure_sql(args.server_name, args.database_name, args.username, password)
                 create_table_azure_sql(connection, args.table_name, args.column_definitions)

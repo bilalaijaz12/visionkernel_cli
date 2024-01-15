@@ -1,33 +1,36 @@
+# Import necessary libraries
 import pandas as pd
-import psycopg2
+import mysql.connector
 
-def get_postgresql_data_type(pandas_dtype):
-    """Maps pandas data types to PostgreSQL data types."""
+# Function to map pandas data types to MySQL data types
+def get_mysql_data_type(pandas_dtype):
+    """Maps pandas data types to MySQL data types."""
     if pandas_dtype.name.startswith('int'):
-        return 'INTEGER'
+        return 'INT'  # MySQL integer type
     elif pandas_dtype.name.startswith('float'):
-        return 'REAL'  # or 'DOUBLE PRECISION' for higher precision
+        return 'FLOAT'  # or 'DOUBLE' for higher precision
     elif pandas_dtype.name.startswith('datetime'):
-        return 'TIMESTAMP'
+        return 'DATETIME'  # MySQL datetime type
     elif pandas_dtype.name.startswith('bool'):
         return 'BOOLEAN'
     else:
-        return 'VARCHAR'  # Default to VARCHAR for other types
+        return 'VARCHAR(255)'  # Default to VARCHAR for other types
 
+# Function to create a MySQL table based on the structure of an Excel file
 def auto_create_table_from_excel(connection, table_name, excel_file_path, sheet_name):
     try:
         # Read Excel file into a Pandas DataFrame
         df = pd.read_excel(excel_file_path, sheet_name=sheet_name)
 
         # Start creating the SQL statement
-        create_table_sql = f"CREATE TABLE {table_name} ("
+        create_table_sql = f"CREATE TABLE IF NOT EXISTS {table_name} ("
 
         # Generate column definitions
         column_definitions = []
         for col in df.columns:
             # Format column name for SQL (replace spaces, etc.)
             formatted_col = col.replace(" ", "_").lower()
-            col_data_type = get_postgresql_data_type(df[col].dtype)
+            col_data_type = get_mysql_data_type(df[col].dtype)
             column_definitions.append(f"{formatted_col} {col_data_type}")
 
         # Combine column definitions and complete SQL statement
@@ -43,20 +46,20 @@ def auto_create_table_from_excel(connection, table_name, excel_file_path, sheet_
     except Exception as e:
         print(f"Error creating table: {e}")
 
-
+# Function to upload data from an Excel file to a MySQL table
 def upload_excel_data(connection, table_name, excel_file_path, sheet_name):
     try:
         # Read Excel file into a Pandas DataFrame
         df = pd.read_excel(excel_file_path, sheet_name=sheet_name)
 
+        # Convert NaN values to None
+        df = df.where(pd.notna(df), None)
+
         # Format column names (convert to lowercase) and create SQL statement
-        formatted_columns = [f'"{str(col).lower()}"' for col in df.columns]
+        formatted_columns = [f'"{col.lower()}"' for col in df.columns]
         columns = ', '.join(formatted_columns)
         placeholders = ', '.join(['%s'] * len(df.columns))
         insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders});"
-
-        # Convert NaN values to None
-        df = df.where(pd.notna(df), None)
 
         # Create a list of tuples from the DataFrame
         records = [tuple(row) for row in df.to_records(index=False)]
