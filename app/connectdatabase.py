@@ -8,7 +8,7 @@ from google.cloud import storage
 def connect_to_aws_rds(database_name, username, password, database_endpoint, port):
     try:
         # Establish connection
-        conn = mysql.connecter.connect(
+        conn = mysql.connector.connect(
             user=username,
             password=password,
             host=database_endpoint,

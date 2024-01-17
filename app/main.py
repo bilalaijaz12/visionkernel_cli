@@ -1,10 +1,10 @@
-# import os
+import os
 import argparse
 import getpass
 from convert import convert_to_excel
 from connectdatabase import connect_to_aws_rds, connect_to_azure_sql, connect_to_google_cloud_sql, connect_to_google_cloud_storage, create_table_mysql, create_table_azure_sql, create_table_gcloud_sql
 from createtable import create_custom_table, list_tables
-from uploaddata import upload_excel_data, auto_create_table_from_excel
+from uploaddata import upload_excel_data
 
 
 def main():
@@ -60,6 +60,8 @@ def main():
 
     if args.action == 'convert':
         convert_to_excel(args.input_file, args.output_file)
+    # ...
+
     elif args.action == 'aws':
         # AWS RDS database connection setup
         database_name = args.database_name or input("Enter database name: ")
@@ -70,31 +72,25 @@ def main():
 
         connection = connect_to_aws_rds(database_name, username, password, database_endpoint, port)
 
-        existing_tables = list_tables(connection)
-        print("Existing tables:", existing_tables)
-
         if connection:
             upload_data_response = input("Would you like to upload data from an excel file? (y/n): ").lower()
 
             if upload_data_response == 'y':
                 excel_file_path = input("Enter the path to the excel file: ")
                 sheet_name = input("Enter the name of the sheet to upload: ")
-
-                create_table_response = input("Would you like to create a new table? (y/n): ").lower()
-
-                if create_table_response == 'y':
-                    table_name = input("Enter the name of the new table: ")
-                    auto_create_table_from_excel(connection, table_name, excel_file_path, sheet_name)
-                else:
-                    table_name = input("Enter the name of the table to upload to: ")
+                table_name = input("Enter the name of the table: ")
 
                 upload_excel_data(connection, table_name, excel_file_path, sheet_name)
 
                 connection.close()
 
+# ... similar structure for 'azure' and 'gcp' ...
+
+# ...
+
+
         # ... similar structure for 'azure' and 'gcp' ...
 
-        connection.close()
 
     elif args.action == 'azure':
         # Azure SQL database connection

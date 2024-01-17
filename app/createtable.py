@@ -1,8 +1,19 @@
+from contextlib import contextmanager
+
+@contextmanager
+def mysql_cursor(connection):
+    cursor = connection.cursor()
+    try:
+        yield cursor
+    finally:
+        cursor.close()
+
+
 # Function to create a custom table in a database
 def create_custom_table(connection, table_name):
     try:
         # Create a cursor object using the connection
-        with connection.cursor() as cursor:
+        with mysql_cursor(connection) as cursor:
             # SQL statement to create a table with specified name if it doesn't exist
             # The table has three columns: id (primary key), column1, and column2
             # All columns are of type VARCHAR(255)
@@ -29,7 +40,7 @@ def create_custom_table(connection, table_name):
 def list_tables(connection):
     try:
         # Create a cursor object using the connection
-        with connection.cursor() as cursor:
+        with mysql_cursor(connection) as cursor:
             # SQL statement to list all tables
             list_tables_sql = """
                 SHOW TABLES;
