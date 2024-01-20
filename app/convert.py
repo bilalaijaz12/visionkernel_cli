@@ -16,13 +16,13 @@ def convert_to_excel(input_file, output_file):
     except Exception as e:
         print(f"Conversion failed: {str(e)}")
 
-# def main():
-#     parser = argparse.ArgumentParser(description="Convert CSV and text files to Excel")
-#     parser.add_argument("input_file", help="Input CSV or text file")
-#     parser.add_argument("output_file", help="Output Excel file")
-#     args = parser.parse_args()
+def main():
+    parser = argparse.ArgumentParser(description="Convert CSV and text files to Excel")
+    parser.add_argument("input_file", help="Input CSV or text file")
+    parser.add_argument("output_file", help="Output Excel file")
+    args = parser.parse_args()
 
-#     convert_to_excel(args.input_file, args.output_file)
+    convert_to_excel(args.input_file, args.output_file)
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
